@@ -27,7 +27,7 @@ contract Exchange {
     {
         require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
 
-        return inputReserve / outputReserve;
+        return inputReserve * 1000 / outputReserve;
     }
 
     // delta y = y x delta x / (x + delta x)
