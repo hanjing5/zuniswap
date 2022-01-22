@@ -47,6 +47,20 @@ describe("Exchange", () => {
       expect(await getBalance(exchange.address)).to.equal(0);
       expect(await exchange.getReserve()).to.equal(0);
     });
+
+    it("returns correct prices", async () => {
+      await token.approve(exchange.address, toWei(2000));
+      await exchange.addLiquidity(toWei(2000), { value: toWei(1000) });
+
+      const tokenReserve = await exchange.getReserve();
+      const etherReserve = await getBalance(exchange.address);
+
+      // ETH per token
+      expect(await exchange.getPrice(etherReserve, tokenReserve)).to.eq("500");
+
+      // token per ETH
+      expect(await exchange.getPrice(tokenReserve, etherReserve)).to.eq(2000);
+    }); 
   });
 
 });
