@@ -14,22 +14,21 @@ contract Exchange {
     function addLiquidity(uint256 _tokenAmount) public payable {
         IERC20 token = IERC20(tokenAddress);
         token.transferFrom(msg.sender, address(this), _tokenAmount);
-   
     }
 
     function getReserve() public view returns (uint256) {
         return IERC20(tokenAddress).balanceOf(address(this));
     }
 
-function getPrice(uint256 inputReserve, uint256 outputReserve)
-  public
-  pure
-  returns (uint256)
-{
-  require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
+    function getPrice(uint256 inputReserve, uint256 outputReserve)
+        public
+        pure
+        returns (uint256)
+    {
+        require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
 
-  return inputReserve / outputReserve;
-}
+        return inputReserve / outputReserve;
+    }
 
     // delta y = y x delta x / (x + delta x)
     function getAmount(
@@ -42,7 +41,7 @@ function getPrice(uint256 inputReserve, uint256 outputReserve)
         return (inputAmount * outputReserve) / (inputReserve + inputAmount);
     }
 
-    function getTokenAmount(uint256 _ethSold) public view returns(uint256) {
+    function getTokenAmount(uint256 _ethSold) public view returns (uint256) {
         require(_ethSold > 0, "ethSold is too small");
 
         uint256 tokenReserve = getReserve();
@@ -51,7 +50,7 @@ function getPrice(uint256 inputReserve, uint256 outputReserve)
     }
 
     function getEthAmount(uint256 _tokenSold) public view returns (uint256) {
-        require(_tokenSold >0, "tokenSold is too small");
+        require(_tokenSold > 0, "tokenSold is too small");
 
         uint256 tokenReserve = getReserve();
 
@@ -81,7 +80,11 @@ function getPrice(uint256 inputReserve, uint256 outputReserve)
 
         require(ethBought >= _minEth, "insufficient output amount");
 
-        IERC20(tokenAddress).transferFrom(msg.sender, address(this), _tokensSold);
+        IERC20(tokenAddress).transferFrom(
+            msg.sender,
+            address(this),
+            _tokensSold
+        );
 
         payable(msg.sender).transfer(ethBought);
     }
