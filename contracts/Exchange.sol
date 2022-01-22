@@ -1,6 +1,6 @@
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
 pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Exchange {
     address public tokenAddress;
@@ -27,10 +27,9 @@ contract Exchange {
     {
         require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
 
-        return inputReserve * 1000 / outputReserve;
+        return (inputReserve * 1000) / outputReserve;
     }
 
-    // delta y = y x delta x / (x + delta x)
     function getAmount(
         uint256 inputAmount,
         uint256 inputReserve,
@@ -43,6 +42,7 @@ contract Exchange {
 
     function getTokenAmount(uint256 _ethSold) public view returns (uint256) {
         require(_ethSold > 0, "ethSold is too small");
+
         uint256 tokenReserve = getReserve();
 
         return getAmount(_ethSold, address(this).balance, tokenReserve);
@@ -56,8 +56,6 @@ contract Exchange {
         return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
 
-
-    //  __minTokens – this is a minimal amount of tokens the user wants to get in exchange for their ethers. This amount is calculated in UI and always includes slippage tolerance; user agrees to get at least that much but not less. This is a very important mechanism that protects users from front-running bots that try to intercept their transactions and modify pool balances to for their profit.
     function ethToTokenSwap(uint256 _minTokens) public payable {
         uint256 tokenReserve = getReserve();
         uint256 tokensBought = getAmount(
@@ -71,9 +69,7 @@ contract Exchange {
         IERC20(tokenAddress).transfer(msg.sender, tokensBought);
     }
 
-    // The function basically transfers _tokensSold of tokens from user’s balance 
-    // and sends them ethBought of ethers in exchange.
-    function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public payable {
+    function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public {
         uint256 tokenReserve = getReserve();
         uint256 ethBought = getAmount(
             _tokensSold,
@@ -88,7 +84,6 @@ contract Exchange {
             address(this),
             _tokensSold
         );
-
         payable(msg.sender).transfer(ethBought);
     }
 }
