@@ -50,4 +50,34 @@ contract Exchange {
 
         return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
+
+
+    //  __minTokens – this is a minimal amount of tokens the user wants to get in exchange for their ethers. This amount is calculated in UI and always includes slippage tolerance; user agrees to get at least that much but not less. This is a very important mechanism that protects users from front-running bots that try to intercept their transactions and modify pool balances to for their profit.
+    function ethToTokenSwap(uint256 _minTokens) public payable {
+        uint256 tokenReserve = getReserve();
+        uint256 tokensBought = getAmount(
+            msg.value,
+            address(this).balance - msg.value,
+            tokenReserve
+        );
+        require(tokensBought>= _minTokens, "insufficient output amount");
+
+        IERC20(tokenAddress).transfer(msg.sender, tokensBought);
+    }
+
+    // The function basically transfers _tokensSold of tokens from user’s balance 
+    // and sends them ethBought of ethers in exchange.
+    function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public payable {
+        uint256 tokenReserve = getReserve();
+        uint256 ethBought = getAmount(
+            _tokensSold,
+            tokenReserve,
+            address(this).balance
+        );
+
+        require(ethBought >= _minEth, "inusffient output amount");
+
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), _tokensSold);
+        payable(msg.sender).transfer(ethBought);
+    }
 }   
