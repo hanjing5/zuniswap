@@ -83,7 +83,10 @@ contract Exchange is ERC20 {
     Notice that LP-tokens are burnt each time liquidity is removed. LP-tokens are only backed by deposited liquidity.
     // https://jeiwan.net/posts/programming-defi-uniswap-2
      */
-    function removeLiquidity(uint _amount) public returns (uint256, uint256) {
+    function removeLiquidity(uint _amount)
+        public
+        returns (uint256, uint256)
+    {
         require(_amount > 0, "invalid amount");
 
         uint256 ethAmount = (address(this).balance * _amount) / totalSupply();
@@ -108,24 +111,6 @@ contract Exchange is ERC20 {
         require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
 
         return (inputReserve * 1000) / outputReserve;
-    }
-    
-    // We’ll take 1% just so that it’s easier to see the difference in tests. 
-    // Adding fees to the contract is as easy as adding a couple of multipliers 
-    // to getAmount function:
-    // https://jeiwan.net/posts/programming-defi-uniswap-2/
-    function getAmount(
-        uint256 inputAmount,
-        uint256 inputReserve,
-        uint256 outputReserve
-    ) private pure returns (uint256) {
-        require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
-
-        uint256 inputAmountWithFee = inputAmount * 99;
-        uint256 numerator = inputAmountWithFee * outputReserve;
-        uint256 denominator = (inputReserve * 100) + inputAmountWithFee;
-    
-        return numerator / denominator;
     }
 
     function getTokenAmount(uint256 _ethSold) public view returns (uint256) {
@@ -224,8 +209,26 @@ contract Exchange is ERC20 {
         );
 
         IExchange(exchangeAddress).ethToTokenTransfer{value: ethBought}(
-        _minTokensBought,
-        msg.sender
-    );
+            _minTokensBought,
+            msg.sender
+        );
+    }
+
+    // We’ll take 1% just so that it’s easier to see the difference in tests. 
+    // Adding fees to the contract is as easy as adding a couple of multipliers 
+    // to getAmount function:
+    // https://jeiwan.net/posts/programming-defi-uniswap-2/
+    function getAmount(
+        uint256 inputAmount,
+        uint256 inputReserve,
+        uint256 outputReserve
+    ) private pure returns (uint256) {
+        require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
+
+        uint256 inputAmountWithFee = inputAmount * 99;
+        uint256 numerator = inputAmountWithFee * outputReserve;
+        uint256 denominator = (inputReserve * 100) + inputAmountWithFee;
+    
+        return numerator / denominator;
     }
 }
