@@ -1,8 +1,17 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 
 // https://jeiwan.net/posts/programming-defi-uniswap-3/
+interface IExchange {
+    function ethToTokenSwap(uint256 _minTokens) external payable;
+
+    function ethToTokenTransfer(uint256 _minTokens, address _recipient)
+        external
+        payable;
+}
 interface IFactory {
     function getExchange(address _tokenAddress) external returns (address);
 }
@@ -15,7 +24,7 @@ contract Exchange is ERC20 {
         require(_token != address(0), "invalid token address");
 
         tokenAddress = _token;
-        factoryAddress = msg.token; // https://jeiwan.net/posts/programming-defi-uniswap-3/
+        factoryAddress = msg.sender; // https://jeiwan.net/posts/programming-defi-uniswap-3/
     }
 
     // if reserve is 0, allow any liquidity to be added
@@ -46,7 +55,7 @@ contract Exchange is ERC20 {
             token.transferFrom(msg.sender, address(this), tokenAmount);
 
             // Additional liquidity mints LP-tokens proportionally to the amount of ethers deposited:
-            uint256 liqudity = (totalSupply() * msg.value) / ethReserve;
+            uint256 liquidity = (totalSupply() * msg.value) / ethReserve;
             _mint(msg.sender, liquidity);
             return liquidity;
             
@@ -184,7 +193,7 @@ contract Exchange is ERC20 {
     https://jeiwan.net/posts/programming-defi-uniswap-3/    
     */
     function tokenToTokenSwap(
-        uint256 _tokenSold,
+        uint256 _tokensSold,
         uint256 _minTokensBought,
         address _tokenAddress
     )
