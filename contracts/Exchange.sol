@@ -83,7 +83,7 @@ contract Exchange is ERC20 {
     Notice that LP-tokens are burnt each time liquidity is removed. LP-tokens are only backed by deposited liquidity.
     // https://jeiwan.net/posts/programming-defi-uniswap-2
      */
-    function removeLiquidity(uint _amount)
+    function removeLiquidity(uint256 _amount)
         public
         returns (uint256, uint256)
     {
@@ -118,7 +118,6 @@ contract Exchange is ERC20 {
 
         return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
-
 
     function ethToToken(uint256 _minTokens, address recipient) private {
         uint256 tokenReserve = getReserve();
@@ -219,7 +218,7 @@ contract Exchange is ERC20 {
         uint256 inputAmountWithFee = inputAmount * 99;
         uint256 numerator = inputAmountWithFee * outputReserve;
         uint256 denominator = (inputReserve * 100) + inputAmountWithFee;
-    
+
         return numerator / denominator;
     }
 }
