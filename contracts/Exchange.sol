@@ -12,6 +12,7 @@ interface IExchange {
         external
         payable;
 }
+
 interface IFactory {
     function getExchange(address _tokenAddress) external returns (address);
 }
@@ -55,16 +56,16 @@ contract Exchange is ERC20 {
             uint256 tokenAmount = (msg.value * tokenReserve) / ethReserve;
             // given a fixed amount of ETH (msg.value), we want as much token as 
             // the user is willing to part with
-            require(_tokenAmount >= tokenAmount, "insufficient token amount"); 
+            require(_tokenAmount >= tokenAmount, "insufficient token amount");
 
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), tokenAmount);
 
             // Additional liquidity mints LP-tokens proportionally to the amount of ethers deposited:
-            uint256 liquidity = (totalSupply() * msg.value) / ethReserve;
+            uint256 liquidity = (msg.value * totalSupply()) / ethReserve;
             _mint(msg.sender, liquidity);
+
             return liquidity;
-            
         }
     }
 
