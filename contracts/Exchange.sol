@@ -133,15 +133,15 @@ contract Exchange is ERC20 {
         IERC20(tokenAddress).transfer(recipient, tokensBought);
     }
 
-    function ethToTokenSwap(uint256 _minTokens) public payable {
-        ethToToken(_minTokens, msg.sender);
-    }
-    
     function ethToTokenTransfer(uint256 _minTokens, address _recipient)
         public
         payable
     {
         ethToToken(_minTokens, _recipient);
+    }
+
+    function ethToTokenSwap(uint256 _minTokens) public payable {
+        ethToToken(_minTokens, msg.sender);
     }
 
     function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public {
