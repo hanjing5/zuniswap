@@ -31,12 +31,11 @@ contract Exchange is ERC20 {
 
     // if reserve is 0, allow any liquidity to be added
     // if reserve is not 0, enforce proportion
-    function addLiquidity(uint256 _tokenAmount) 
+    function addLiquidity(uint256 _tokenAmount)
         public
         payable
         returns (uint256)
     {
-
         // initial creation of liquidity pool
         // https://jeiwan.net/posts/programming-defi-uniswap-2/
         if (getReserve() == 0) {
@@ -47,7 +46,8 @@ contract Exchange is ERC20 {
             // equals to the amount of ethers deposited.
             uint256 liquidity = address(this).balance;
             _mint(msg.sender, liquidity);
-            return liquidity; 
+            
+            return liquidity;
         } else {
             // https://jeiwan.net/posts/programming-defi-uniswap-2
             uint256 ethReserve = address(this).balance - msg.value;
