@@ -103,16 +103,6 @@ contract Exchange is ERC20 {
         return IERC20(tokenAddress).balanceOf(address(this));
     }
 
-    function getPrice(uint256 inputReserve, uint256 outputReserve)
-        public
-        pure
-        returns (uint256)
-    {
-        require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
-
-        return (inputReserve * 1000) / outputReserve;
-    }
-
     function getTokenAmount(uint256 _ethSold) public view returns (uint256) {
         require(_ethSold > 0, "ethSold is too small");
 
