@@ -11,11 +11,13 @@ contract Exchange {
         tokenAddress = _token;
     }
 
+    // if reserve is 0, allow any liquidity to be added
+    // if reserve is not 0, enforce proportion
     function addLiquidity(uint256 _tokenAmount) public payable {
 
         if (getReserve() == 0) {
-        IERC20 token = IERC20(tokenAddress);
-        token.transferFrom(msg.sender, address(this), _tokenAmount);    
+            IERC20 token = IERC20(tokenAddress);
+            token.transferFrom(msg.sender, address(this), _tokenAmount);    
         } else {
             uint256 ethReserve = address(this).balance - msg.value;
             uint256 tokenReserve = getReserve();
@@ -25,7 +27,6 @@ contract Exchange {
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), tokenAmount);
         }
-        
     }
 
     function getReserve() public view returns (uint256) {
