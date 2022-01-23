@@ -2,6 +2,11 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+// https://jeiwan.net/posts/programming-defi-uniswap-3/
+interface IFactory {
+    function getExchange(address _tokenAddress) external returns (address);
+}
+
 contract Exchange is ERC20 {
     address public tokenAddress; 
     address public factoryAddress; // https://jeiwan.net/posts/programming-defi-uniswap-3/
@@ -124,7 +129,8 @@ contract Exchange is ERC20 {
         return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
 
-    function ethToTokenSwap(uint256 _minTokens) public payable {
+
+    function ethToToken(uint256 _minTokens, address recipient) private {
         uint256 tokenReserve = getReserve();
         uint256 tokensBought = getAmount(
             msg.value,
@@ -134,7 +140,18 @@ contract Exchange is ERC20 {
 
         require(tokensBought >= _minTokens, "insufficient output amount");
 
-        IERC20(tokenAddress).transfer(msg.sender, tokensBought);
+        IERC20(tokenAddress).transfer(recipient, tokensBought);
+    }
+
+    function ethToTokenSwap(uint256 _minTokens) public payable {
+        ethToToken(_minTokens, msg.sender);
+    }
+    
+    function ethToTokenTransfer(uint256 _minTokens, address _recipient)
+        public
+        payable
+    {
+        ethToToken(_minTokens, _recipient);
     }
 
     function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public {
@@ -153,5 +170,47 @@ contract Exchange is ERC20 {
             _tokensSold
         );
         payable(msg.sender).transfer(ethBought);
+    }
+
+    /**
+    1. Begin the standard token-to-ether swap.
+    2. Instead of sending ethers to user, find an exchange for the token address provided by user.
+    3. If the exchange exists, send the ethers to the exchange to swap them to tokens.
+    4. Return swapped tokens to user.
+
+    three arguments: the amount of tokens to be sold, minimal amount of tokens to get in exchange, 
+    the address of the token to exchange sold tokens for.
+
+    https://jeiwan.net/posts/programming-defi-uniswap-3/    
+    */
+    function tokenToTokenSwap(
+        uint256 _tokenSold,
+        uint256 _minTokensBought,
+        address _tokenAddress
+    )
+    public {
+        address exchangeAddress = IFactory(factoryAddress).getExchange(
+            _tokenAddress
+        );
+        require(exchangeAddress != address(this) && exchangeAddress != address(0),
+        "invalid exchange address" );
+
+        uint256 tokenReserve = getReserve();
+        uint256 ethBought = getAmount(
+            _tokensSold,
+            tokenReserve,
+            address(this).balance
+        );
+
+        IERC20(tokenAddress).transferFrom(
+            msg.sender,
+            address(this),
+            _tokensSold
+        );
+
+        IExchange(exchangeAddress).ethToTokenTransfer{value: ethBought}(
+        _minTokensBought,
+        msg.sender
+    );
     }
 }
