@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
 // https://jeiwan.net/posts/programming-defi-uniswap-3/
@@ -18,13 +18,15 @@ interface IFactory {
 
 contract Exchange is ERC20 {
     address public tokenAddress; 
-    address public factoryAddress; // https://jeiwan.net/posts/programming-defi-uniswap-3/
+    // https://jeiwan.net/posts/programming-defi-uniswap-3/
+    address public factoryAddress;
 
     constructor(address _token) ERC20 ("Zuniswap-V1", "ZUNI-V1") {
         require(_token != address(0), "invalid token address");
 
         tokenAddress = _token;
-        factoryAddress = msg.sender; // https://jeiwan.net/posts/programming-defi-uniswap-3/
+        // https://jeiwan.net/posts/programming-defi-uniswap-3/
+        factoryAddress = msg.sender;
     }
 
     // if reserve is 0, allow any liquidity to be added
