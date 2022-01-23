@@ -17,11 +17,11 @@ interface IFactory {
 }
 
 contract Exchange is ERC20 {
-    address public tokenAddress; 
+    address public tokenAddress;
     // https://jeiwan.net/posts/programming-defi-uniswap-3/
     address public factoryAddress;
 
-    constructor(address _token) ERC20 ("Zuniswap-V1", "ZUNI-V1") {
+    constructor(address _token) ERC20("Zuniswap-V1", "ZUNI-V1") {
         require(_token != address(0), "invalid token address");
 
         tokenAddress = _token;
