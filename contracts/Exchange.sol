@@ -16,6 +16,7 @@ contract Exchange is ERC20 {
     function addLiquidity(uint256 _tokenAmount) public payable returns (uint256){
 
         // initial creation of liquidity pool
+        // https://jeiwan.net/posts/programming-defi-uniswap-2/
         if (getReserve() == 0) {
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), _tokenAmount);   
@@ -26,6 +27,7 @@ contract Exchange is ERC20 {
             _mint(msg.sender, liquidity);
             return liquidity; 
         } else {
+            // https://jeiwan.net/posts/programming-defi-uniswap-2
             uint256 ethReserve = address(this).balance - msg.value;
             uint256 tokenReserve = getReserve();
             uint256 tokenAmount = msg.value * (tokenReserve / ethReserve);
@@ -57,6 +59,7 @@ contract Exchange is ERC20 {
     To calculate the amounts we multiply reserves by the share of LP-tokens:
 
     Notice that LP-tokens are burnt each time liquidity is removed. LP-tokens are only backed by deposited liquidity.
+    // https://jeiwan.net/posts/programming-defi-uniswap-2
      */
     function removeLiquidity(uint _amount) public returns (uint256, uint256) {
         require(_amount > 0, "invalid amount");
@@ -88,6 +91,7 @@ contract Exchange is ERC20 {
     // We’ll take 1% just so that it’s easier to see the difference in tests. 
     // Adding fees to the contract is as easy as adding a couple of multipliers 
     // to getAmount function:
+    // https://jeiwan.net/posts/programming-defi-uniswap-2/
     function getAmount(
         uint256 inputAmount,
         uint256 inputReserve,
