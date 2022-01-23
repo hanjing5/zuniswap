@@ -40,19 +40,19 @@ contract Exchange is ERC20 {
         // https://jeiwan.net/posts/programming-defi-uniswap-2/
         if (getReserve() == 0) {
             IERC20 token = IERC20(tokenAddress);
-            token.transferFrom(msg.sender, address(this), _tokenAmount);   
+            token.transferFrom(msg.sender, address(this), _tokenAmount);
 
             // when adding initial liquidity, the amount of LP-tokens issued 
             // equals to the amount of ethers deposited.
             uint256 liquidity = address(this).balance;
             _mint(msg.sender, liquidity);
-            
+
             return liquidity;
         } else {
             // https://jeiwan.net/posts/programming-defi-uniswap-2
             uint256 ethReserve = address(this).balance - msg.value;
             uint256 tokenReserve = getReserve();
-            uint256 tokenAmount = msg.value * (tokenReserve / ethReserve);
+            uint256 tokenAmount = (msg.value * tokenReserve) / ethReserve;
             // given a fixed amount of ETH (msg.value), we want as much token as 
             // the user is willing to part with
             require(_tokenAmount >= tokenAmount, "insufficient token amount"); 
